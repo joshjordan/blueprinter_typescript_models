@@ -26,6 +26,8 @@ ActiveRecord::Base.establish_connection(
 
 # Ensure clean database state for tests
 ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS users")
+ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS admin_users")
+ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS posts")
 
 # Create test schema
 ActiveRecord::Schema.define do
@@ -39,20 +41,16 @@ ActiveRecord::Schema.define do
     t.string :tags, array: true
     t.timestamps
   end
-end
 
-# Define test models
-class User < ActiveRecord::Base
-end
+  create_table :admin_users do |t|
+    t.boolean :super_admin, default: false
+    t.timestamps
+  end
 
-# Define test blueprints
-class UserBlueprint < Blueprinter::Base
-  identifier :id
-  field :name
-  field :email
-  field :bio, typescript_type: "string | null"
-  field :settings
-  field :admin
-  field :last_login_at
-  field :tags
+  create_table :posts do |t|
+    t.string :title
+    t.text :content
+    t.references :user
+    t.timestamps
+  end
 end
