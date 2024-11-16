@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    blueprinter_typescript_models (0.1.0)
+    blueprinter_typescript_models (0.1.1)
       activesupport (>= 5.0)
       blueprinter (~> 1.1.0)
       rake (>= 12.0)
@@ -134,6 +134,8 @@ GEM
     nio4r (2.7.4)
     nokogiri (1.16.7-arm64-darwin)
       racc (~> 1.4)
+    nokogiri (1.16.7-x86_64-linux)
+      racc (~> 1.4)
     parallel (1.26.3)
     parser (3.3.6.0)
       ast (~> 2.4.1)
@@ -238,6 +240,7 @@ GEM
 
 PLATFORMS
   arm64-darwin-23
+  x86_64-linux
 
 DEPENDENCIES
   blueprinter_typescript_models!
@@ -249,4 +252,4 @@ DEPENDENCIES
   rubocop-rspec (~> 2.22)
 
 BUNDLED WITH
-   2.2.33
+   2.5.11
