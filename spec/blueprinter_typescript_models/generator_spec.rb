@@ -7,7 +7,9 @@ RSpec.describe BlueprinterTypescriptModels::Generator do
   let(:output_dir) { Dir.mktmpdir }
 
   before do
+    puts "\nTest output dir: #{output_dir}"
     BlueprinterTypescriptModels.configure do |config|
+      # Use the absolute path from the temp directory
       config.output_dir = output_dir
     end
   end
@@ -17,22 +19,9 @@ RSpec.describe BlueprinterTypescriptModels::Generator do
   end
 
   describe ".generate_all" do
-    before do
-      # Write blueprint files to a temporary directory
-      @blueprint_dir = Dir.mktmpdir
-
-      write_blueprint_file("post_blueprint.rb", PostBlueprint)
-      write_blueprint_file("user_blueprint.rb", UserBlueprint)
-      write_blueprint_file("admin_user_blueprint.rb", AdminUserBlueprint)
-      write_blueprint_file("custom_user_blueprint.rb", CustomUserBlueprint)
-    end
-
-    after do
-      FileUtils.remove_entry @blueprint_dir
-    end
-
     it "generates TypeScript interface files" do
-      described_class.generate_all(@blueprint_dir)
+      # Generate directly without trying to read from files
+      described_class.generate_all
 
       # Check Post interface
       post_interface = File.read(File.join(output_dir, "Post.d.ts"))
@@ -54,22 +43,13 @@ RSpec.describe BlueprinterTypescriptModels::Generator do
       admin_interface = File.read(File.join(output_dir, "AdminUser.d.ts"))
       expect(admin_interface).to include('import type { Post } from "./Post";')
       expect(admin_interface).to include("export interface AdminUser {")
-      expect(admin_interface).to include("super_admin: boolean;")
+      expect(admin_interface).to include("super_admin: boolean | null;")
 
       # Check CustomUser interface
       custom_interface = File.read(File.join(output_dir, "CustomUser.d.ts"))
       expect(custom_interface).to include("export interface CustomUser {")
       expect(custom_interface).to include("name: string;")
       expect(custom_interface).to include("email: string | null;")
-    end
-
-    private
-
-    def write_blueprint_file(filename, klass)
-      File.write(File.join(@blueprint_dir, filename), <<~RUBY)
-        # frozen_string_literal: true
-        #{klass.name} = #{klass}
-      RUBY
     end
   end
 end

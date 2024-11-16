@@ -26,24 +26,20 @@ ActiveRecord::Base.establish_connection(
 
 # Ensure clean database state for tests
 ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS users")
-ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS admin_users")
 ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS posts")
 
 # Create test schema
 ActiveRecord::Schema.define do
   create_table :users do |t|
+    t.string :type # For STI
     t.string :name, null: false
     t.string :email
     t.text :bio
     t.jsonb :settings
-    t.boolean :admin, default: false
+    t.boolean :admin, null: false, default: false
+    t.boolean :super_admin, default: false
     t.datetime :last_login_at
     t.string :tags, array: true
-    t.timestamps
-  end
-
-  create_table :admin_users do |t|
-    t.boolean :super_admin, default: false
     t.timestamps
   end
 
@@ -56,8 +52,11 @@ ActiveRecord::Schema.define do
 end
 
 # Define test models
-class User < ActiveRecord::Base; end
-class AdminUser < User; end
+class User < ActiveRecord::Base
+end
+
+class AdminUser < User
+end
 
 class Post < ActiveRecord::Base
   belongs_to :user

@@ -6,30 +6,35 @@ module BlueprinterTypescriptModels
   class Generator
     class << self
       def generate_all(blueprints_path = nil)
-        blueprints_path ||= File.join(Dir.pwd, "app/blueprints")
-        output_dir = File.join(Dir.pwd, BlueprinterTypescriptModels.configuration.output_dir)
-
+        output_dir = if BlueprinterTypescriptModels.configuration.output_dir.start_with?("/")
+                       BlueprinterTypescriptModels.configuration.output_dir
+                     else
+                       File.join(Dir.pwd, BlueprinterTypescriptModels.configuration.output_dir)
+                     end
         FileUtils.mkdir_p(output_dir)
 
-        Dir[File.join(blueprints_path, "**/*.rb")].each do |blueprint_file|
-          generate_from_file(blueprint_file, output_dir)
+        if blueprints_path
+          # Generate from files in directory
+          Dir[File.join(blueprints_path, "**/*.rb")].each do |blueprint_file|
+            require blueprint_file
+            blueprint_class = File.basename(blueprint_file, ".rb").camelize.constantize
+            generate_for_blueprint(blueprint_class, output_dir) if blueprint_class < Blueprinter::Base
+          end
+        else
+          # Generate from already loaded blueprints
+          ObjectSpace.each_object(Class).select do |klass|
+            klass < Blueprinter::Base
+          end.each do |blueprint_class|
+            generate_for_blueprint(blueprint_class, output_dir)
+          end
         end
       end
 
       private
 
-      def generate_from_file(blueprint_file, output_dir)
-        require blueprint_file
-
-        blueprint_class = File.basename(blueprint_file, ".rb")
-                              .camelize
-                              .constantize
-
-        return unless blueprint_class < Blueprinter::Base
-
+      def generate_for_blueprint(blueprint_class, output_dir)
         interface_name = blueprint_class.name.demodulize.gsub("Blueprint", "")
         output_path = File.join(output_dir, "#{interface_name}.d.ts")
-
         content = generate_interface(interface_name, blueprint_class)
         File.write(output_path, content)
       end
