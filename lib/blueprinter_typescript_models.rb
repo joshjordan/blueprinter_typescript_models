@@ -28,19 +28,7 @@ module BlueprinterTypescriptModels
       @output_dir = "frontend/types"
     end
   end
-
-  # Extend Blueprinter field options with typescript_type
-  module TypeScriptField
-    def self.included(base)
-      base.class_eval do
-        option :typescript_type
-      end
-    end
-  end
 end
-
-# Include TypeScript field options in Blueprinter
-Blueprinter::Field.include BlueprinterTypescriptModels::TypeScriptField
 
 require_relative "blueprinter_typescript_models/type_mapper"
 require_relative "blueprinter_typescript_models/generator"

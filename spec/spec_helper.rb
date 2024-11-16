@@ -17,9 +17,15 @@ end
 
 # Setup test database connection
 ActiveRecord::Base.establish_connection(
-  adapter: "sqlite3",
-  database: ":memory:"
+  adapter: "postgresql",
+  database: "blueprinter_typescript_models_test",
+  host: "localhost",
+  username: ENV.fetch("POSTGRES_USER", "postgres"),
+  password: ENV.fetch("POSTGRES_PASSWORD", "postgres")
 )
+
+# Ensure clean database state for tests
+ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS users")
 
 # Create test schema
 ActiveRecord::Schema.define do

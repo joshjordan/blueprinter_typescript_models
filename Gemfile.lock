@@ -138,6 +138,7 @@ GEM
     parser (3.3.6.0)
       ast (~> 2.4.1)
       racc
+    pg (1.5.9)
     psych (5.2.0)
       stringio
     racc (1.8.1)
@@ -224,7 +225,6 @@ GEM
       rubocop (~> 1.61)
     ruby-progressbar (1.13.0)
     securerandom (0.3.2)
-    sqlite3 (2.0.4-arm64-darwin)
     stringio (3.1.2)
     thor (1.3.2)
     timeout (0.4.2)
@@ -241,12 +241,12 @@ PLATFORMS
 
 DEPENDENCIES
   blueprinter_typescript_models!
+  pg
   rails (>= 6.0)
   rspec (~> 3.12)
   rubocop (~> 1.50)
   rubocop-rake (~> 0.6)
   rubocop-rspec (~> 2.22)
-  sqlite3
 
 BUNDLED WITH
    2.2.33
