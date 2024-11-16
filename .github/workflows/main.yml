@@ -3,7 +3,7 @@ name: Ruby
 on:
   push:
     branches:
-      - main
+      - '**'
 
   pull_request:
 
@@ -11,10 +11,26 @@ jobs:
   build:
     runs-on: ubuntu-latest
     name: Ruby ${{ matrix.ruby }}
+    services:
+      postgres:
+        image: postgres:latest
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: blueprinter_typescript_models_test
     strategy:
       matrix:
         ruby:
-          - '2.6.10'
+          - '3.0.6'
+          - '3.1.4'
+          - '3.2.2'
 
     steps:
     - uses: actions/checkout@v3
@@ -23,5 +39,6 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
-    - name: Run the default task
-      run: bundle exec rake
+    - name: Run tests
+      run: |
+        bundle exec rspec
