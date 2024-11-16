@@ -53,21 +53,15 @@ module BlueprinterTypescriptModels
       end
 
       def collect_fields(blueprint_class)
-        blueprint_class.fields.transform_values do |field|
-          TypeMapper.map_field(field, blueprint_class)
+        blueprint_class.reflections[:default].fields.transform_values do |field|
+          TypeMapper.map_field(field.name, blueprint_class)
         end
       end
 
       def collect_associations(blueprint_class)
-        blueprint_class.associations.transform_values do |association|
-          view = association.options[:blueprint] || association.blueprint
-          name = view.name.demodulize.gsub("Blueprint", "")
-
-          if association.options[:blueprint_collection]
-            "#{name}[]"
-          else
-            name
-          end
+        blueprint_class.reflections[:default].associations.transform_values do |assoc|
+          name = assoc.blueprint.name.demodulize.gsub("Blueprint", "")
+          assoc.options[:blueprint_collection] ? "#{name}[]" : name
         end
       end
 

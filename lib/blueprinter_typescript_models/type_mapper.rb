@@ -3,11 +3,14 @@
 module BlueprinterTypescriptModels
   class TypeMapper
     class << self
-      def map_field(field, blueprint_class)
-        return field.options[:typescript_type] if field&.options&.dig(:typescript_type)
+      def map_field(field_name, blueprint_class)
+        field = blueprint_class.reflections[:default].fields[field_name]
+        return "unknown" unless field
 
-        if (model_class = infer_model_class(blueprint_class))
-          map_from_schema(field.name, model_class)
+        if field.options[:typescript_type]
+          field.options[:typescript_type]
+        elsif (model_class = infer_model_class(blueprint_class))
+          map_from_schema(field_name, model_class)
         else
           "unknown"
         end

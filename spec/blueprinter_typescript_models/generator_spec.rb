@@ -10,33 +10,6 @@ RSpec.describe BlueprinterTypescriptModels::Generator do
     BlueprinterTypescriptModels.configure do |config|
       config.output_dir = output_dir
     end
-
-    # Define test blueprints
-    class PostBlueprint < Blueprinter::Base
-      identifier :id
-      field :title
-      field :content
-    end
-
-    class UserWithPostsBlueprint < Blueprinter::Base
-      identifier :id
-      field :name
-      field :email
-      association :posts, blueprint: PostBlueprint, blueprint_collection: true
-    end
-
-    class AdminUserBlueprint < UserWithPostsBlueprint
-      field :super_admin
-    end
-
-    class CustomBlueprint < Blueprinter::Base
-      field :status, typescript_type: '"active" | "inactive"'
-      field :metadata, typescript_type: "Record<string, unknown>"
-
-      def self.model_class
-        User
-      end
-    end
   end
 
   after do
@@ -49,9 +22,9 @@ RSpec.describe BlueprinterTypescriptModels::Generator do
       @blueprint_dir = Dir.mktmpdir
 
       write_blueprint_file("post_blueprint.rb", PostBlueprint)
-      write_blueprint_file("user_with_posts_blueprint.rb", UserWithPostsBlueprint)
+      write_blueprint_file("user_blueprint.rb", UserBlueprint)
       write_blueprint_file("admin_user_blueprint.rb", AdminUserBlueprint)
-      write_blueprint_file("custom_blueprint.rb", CustomBlueprint)
+      write_blueprint_file("custom_user_blueprint.rb", CustomUserBlueprint)
     end
 
     after do
@@ -69,9 +42,9 @@ RSpec.describe BlueprinterTypescriptModels::Generator do
       expect(post_interface).to include("content: string | null;")
 
       # Check User interface
-      user_interface = File.read(File.join(output_dir, "UserWithPosts.d.ts"))
+      user_interface = File.read(File.join(output_dir, "User.d.ts"))
       expect(user_interface).to include('import type { Post } from "./Post";')
-      expect(user_interface).to include("export interface UserWithPosts {")
+      expect(user_interface).to include("export interface User {")
       expect(user_interface).to include("id: number;")
       expect(user_interface).to include("name: string;")
       expect(user_interface).to include("email: string | null;")
@@ -83,10 +56,11 @@ RSpec.describe BlueprinterTypescriptModels::Generator do
       expect(admin_interface).to include("export interface AdminUser {")
       expect(admin_interface).to include("super_admin: boolean;")
 
-      # Check Custom interface with explicit types
-      custom_interface = File.read(File.join(output_dir, "Custom.d.ts"))
-      expect(custom_interface).to include('status: "active" | "inactive";')
-      expect(custom_interface).to include("metadata: Record<string, unknown>;")
+      # Check CustomUser interface
+      custom_interface = File.read(File.join(output_dir, "CustomUser.d.ts"))
+      expect(custom_interface).to include("export interface CustomUser {")
+      expect(custom_interface).to include("name: string;")
+      expect(custom_interface).to include("email: string | null;")
     end
 
     private

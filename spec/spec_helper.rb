@@ -54,3 +54,47 @@ ActiveRecord::Schema.define do
     t.timestamps
   end
 end
+
+# Define test models
+class User < ActiveRecord::Base; end
+class AdminUser < User; end
+
+class Post < ActiveRecord::Base
+  belongs_to :user
+end
+
+# Define test blueprints
+class PostBlueprint < Blueprinter::Base
+  identifier :id
+  field :title
+  field :content
+end
+
+class UserBlueprint < Blueprinter::Base
+  identifier :id
+  field :name
+  field :email
+  field :bio, typescript_type: "string | null"
+  field :settings
+  field :admin
+  field :last_login_at
+  field :tags
+  association :posts, blueprint: PostBlueprint, blueprint_collection: true
+end
+
+class AdminUserBlueprint < UserBlueprint
+  field :super_admin
+end
+
+class CustomUserBlueprint < Blueprinter::Base
+  field :name
+  field :email
+
+  def self.model_class
+    User
+  end
+end
+
+class VirtualBlueprint < Blueprinter::Base
+  field :virtual_field
+end

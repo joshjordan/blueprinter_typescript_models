@@ -32,7 +32,7 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "blueprinter", "~> 0.30.0"
+  spec.add_dependency "blueprinter", "~> 1.1.0"
   spec.add_dependency "activesupport", ">= 5.0"
   spec.add_dependency "rake", ">= 12.0"
 
