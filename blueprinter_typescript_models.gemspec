@@ -2,8 +2,6 @@
 
 require_relative "lib/blueprinter_typescript_models/version"
 
-ruby_version = File.read(File.join(__dir__, '.ruby-version')).strip
-
 Gem::Specification.new do |spec|
   spec.name = "blueprinter_typescript_models"
   spec.version = BlueprinterTypescriptModels::VERSION
@@ -14,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.description = "Automatically generate TypeScript type definitions from Blueprinter serializers, using Blueprinter's declarative DSL for type annotations. Supports custom typescript_type metadata for fields and falls back to database schema types."
   spec.homepage = "https://github.com/joshjordan/blueprinter_typescript_models"
   spec.license = "MIT"
-  spec.required_ruby_version = ">= #{ruby_version}"
+  spec.required_ruby_version = ">= 2.7.0"
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = spec.homepage
