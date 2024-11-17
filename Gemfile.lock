@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    blueprinter_typescript_models (0.1.1)
+    blueprinter_typescript_models (0.1.2)
       activesupport (>= 5.0)
       blueprinter (~> 1.0.2)
       rake (>= 12.0)
@@ -243,7 +243,6 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  blueprinter (= 1.0.2)
   blueprinter_typescript_models!
   pg
   rails (>= 6.0)
