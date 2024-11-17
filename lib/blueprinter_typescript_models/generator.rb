@@ -60,7 +60,7 @@ module BlueprinterTypescriptModels
       def collect_fields(blueprint_class)
         blueprint_class.reflections[:default].fields.transform_values do |field|
           TypeMapper.map_field(field.name, blueprint_class)
-        end
+        end.compact
       end
 
       def collect_associations(blueprint_class)

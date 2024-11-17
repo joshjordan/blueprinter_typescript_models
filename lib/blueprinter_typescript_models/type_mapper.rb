@@ -7,7 +7,9 @@ module BlueprinterTypescriptModels
         field = blueprint_class.reflections[:default].fields[field_name]
         return "unknown" unless field
 
-        if field.options[:typescript_type]
+        if field.options.key?(:typescript_type)
+          return nil unless field.options[:typescript_type]
+
           field.options[:typescript_type]
         elsif (model_class = infer_model_class(blueprint_class))
           map_from_schema(field_name, model_class)
