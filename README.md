@@ -84,6 +84,30 @@ The gem automatically infers TypeScript types from your database schema when `ty
 
 Nullable database columns automatically get union types with `null`.
 
+### FAQ
+
+#### How do I specify the type for a field created by `identifier`?
+
+If the gem cannot infer the identifier's type from the database schema, you can override the `identifier` method in a base class or module for your blueprints. Here's how to do it:
+
+```ruby
+module BlueprintBase
+  def self.identifier(name = nil, options = {})
+    super
+    typescript_type = options[:typescript_type] || :string
+    view_collection[:identifier].fields.values.each { |v| v.options[:typescript_type] = typescript_type }
+  end
+end
+
+# Then in your blueprints:
+class UserBlueprint < Blueprinter::Base
+  extend BlueprintBase
+
+  identifier :id, typescript_type: "string"  # Now typescript_type option works!
+  # ... rest of your blueprint
+end
+```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests.
