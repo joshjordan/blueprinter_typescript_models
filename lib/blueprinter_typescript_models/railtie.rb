@@ -7,6 +7,7 @@ module BlueprinterTypescriptModels
         desc "Generate TypeScript interfaces from Blueprinter blueprints"
         task generate: :environment do
           puts "Generating TypeScript interfaces from Blueprinter blueprints..."
+          Rails.application.eager_load! # Ensure all blueprints are loaded
           BlueprinterTypescriptModels::Generator.generate_all
           puts "TypeScript interfaces generated successfully!"
         end
