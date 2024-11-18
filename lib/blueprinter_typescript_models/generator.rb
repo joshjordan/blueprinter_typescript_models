@@ -58,9 +58,12 @@ module BlueprinterTypescriptModels
       end
 
       def collect_fields(blueprint_class)
-        blueprint_class.reflections[:default].fields.transform_values do |field|
-          TypeMapper.map_field(field.name, blueprint_class)
-        end.compact
+        fields = blueprint_class.reflections[:default].fields
+        fields.each_with_object({}) do |(display_name, field), result|
+          if (type = TypeMapper.map_field(display_name, blueprint_class))
+            result[display_name] = type
+          end
+        end
       end
 
       def collect_associations(blueprint_class)

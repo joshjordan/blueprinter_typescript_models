@@ -5,17 +5,15 @@ module BlueprinterTypescriptModels
     FieldInfo = Struct.new(:model_class, :type, :array, :nullable)
 
     class << self
-      def map_field(field_name, blueprint_class)
-        field = blueprint_class.reflections[:default].fields[field_name]
+      def map_field(display_name, blueprint_class)
+        field = blueprint_class.reflections[:default].fields[display_name]
         return "unknown" unless field
-
-        binding.pry if blueprint_class.name == "CalendarBlueprint"
 
         if field.options.key?(:typescript_type)
           return nil unless field.options[:typescript_type]
 
           field.options[:typescript_type]
-        elsif (field_info = infer_field_info(field_name, blueprint_class))
+        elsif (field_info = infer_field_info(field.name, blueprint_class))
           map_database_type(field_info.type, field_info.array, field_info.nullable)
         else
           "unknown"
