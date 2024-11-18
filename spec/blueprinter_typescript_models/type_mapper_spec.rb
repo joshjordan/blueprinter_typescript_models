@@ -9,6 +9,11 @@ RSpec.describe BlueprinterTypescriptModels::TypeMapper do
         type = described_class.map_field(:bio, UserBlueprint)
         expect(type).to eq("string | null")
       end
+
+      it "returns nil when typescript_type is falsy" do
+        type = described_class.map_field(:skipped_field, UserBlueprint)
+        expect(type).to be_nil
+      end
     end
 
     context "with model inferred from blueprint name" do
@@ -65,6 +70,15 @@ RSpec.describe BlueprinterTypescriptModels::TypeMapper do
       it "returns unknown for virtual fields" do
         type = described_class.map_field(:virtual_field, VirtualBlueprint)
         expect(type).to eq("unknown")
+      end
+    end
+
+    context "with aliased fields" do
+      let(:blueprint_class) { AliasedBlueprint }
+
+      it "maps aliased fields correctly using the original field name" do
+        type = described_class.map_field(:aliased_name, blueprint_class)
+        expect(type).to eq("string")
       end
     end
   end

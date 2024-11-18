@@ -19,7 +19,7 @@ RSpec.describe BlueprinterTypescriptModels do
     after do
       # Reset to default configuration
       described_class.configure do |config|
-        config.output_dir = "frontend/types"
+        config.output_dir = "app/javascript/types"
       end
     end
   end

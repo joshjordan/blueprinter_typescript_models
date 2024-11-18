@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.4]
+
+### Added
+
+- Support for skipping fields by setting `typescript_type: false` in field options
+
+### Fixed
+
+- Ensure all blueprints are loaded when running the rake task by adding Rails eager loading
+- Improved model class lookup to search ObjectSpace for models with matching names when constantize fails
+- Fixed type detection for aliased fields by using the original field name for schema lookup
+
+### Changed
+
+- Unified field type detection using a FieldInfo struct to reduce code duplication
+- Changed default output directory to `app/javascript/types` to better align with Rails conventions
+- Prefixed generated interface names with 'I' to follow TypeScript naming conventions (e.g., IUser)
+
 ## [0.1.3]
 
 ### Changed

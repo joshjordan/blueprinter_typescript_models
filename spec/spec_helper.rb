@@ -78,6 +78,7 @@ class UserBlueprint < Blueprinter::Base
   field :admin
   field :last_login_at
   field :tags
+  field :skipped_field, typescript_type: false
   association :posts, blueprint: PostBlueprint, blueprint_collection: true
 end
 
@@ -96,4 +97,12 @@ end
 
 class VirtualBlueprint < Blueprinter::Base
   field :virtual_field
+end
+
+class AliasedBlueprint < Blueprinter::Base
+  field :name, name: :aliased_name
+
+  def self.model_class
+    User
+  end
 end
