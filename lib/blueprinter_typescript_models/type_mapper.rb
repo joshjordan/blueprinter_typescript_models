@@ -2,17 +2,21 @@
 
 module BlueprinterTypescriptModels
   class TypeMapper
+    FieldInfo = Struct.new(:model_class, :type, :array, :nullable)
+
     class << self
       def map_field(field_name, blueprint_class)
         field = blueprint_class.reflections[:default].fields[field_name]
         return "unknown" unless field
 
+        binding.pry if blueprint_class.name == "CalendarBlueprint"
+
         if field.options.key?(:typescript_type)
           return nil unless field.options[:typescript_type]
 
           field.options[:typescript_type]
-        elsif (model_class = infer_model_class(blueprint_class))
-          map_from_schema(field_name, model_class)
+        elsif (field_info = infer_field_info(field_name, blueprint_class))
+          map_database_type(field_info.type, field_info.array, field_info.nullable)
         else
           "unknown"
         end
@@ -20,42 +24,65 @@ module BlueprinterTypescriptModels
 
       private
 
-      def infer_model_class(blueprint_class)
+      def infer_field_info(field_name, blueprint_class)
         # 1. Check for explicit model_class method
-        return blueprint_class.model_class if blueprint_class.respond_to?(:model_class)
+        if blueprint_class.respond_to?(:model_class)
+          field_info = detect_field_info(blueprint_class.model_class, field_name)
+          return field_info if field_info
+        end
 
         # 2. Try to infer from blueprint name
         model_name = blueprint_class.name.demodulize.sub(/Blueprint$/, "")
         begin
-          model_name.constantize
+          model_class = model_name.constantize
+          field_info = detect_field_info(model_class, field_name)
+          field_info if field_info
         rescue NameError
-          # 3. If that fails, try parent blueprints
-          infer_from_parent_blueprint(blueprint_class)
+          # 3. Search ObjectSpace for matching class name and valid schema
+          matching_classes = ObjectSpace.each_object(Class).select do |klass|
+            klass.name.split("::").last == model_name
+          rescue StandardError
+            nil
+          end
+
+          matching_classes.each do |model_class|
+            field_info = begin
+              detect_field_info(model_class, field_name)
+            rescue StandardError
+              nil
+            end
+            return field_info if field_info
+          end
+
+          # 4. If that fails too, try parent blueprints
+          infer_from_parent_blueprint(field_name, blueprint_class)
         end
       end
 
-      def infer_from_parent_blueprint(blueprint_class)
-        return nil if blueprint_class == Blueprinter::Base
-        return nil unless blueprint_class.superclass
+      def detect_field_info(model_class, field_name)
+        return nil unless model_class&.name
 
-        parent_class = blueprint_class.superclass
-        infer_model_class(parent_class)
-      end
-
-      def map_from_schema(field_name, model_class)
         # Handle ActiveRecord models
         if model_class.respond_to?(:columns_hash) && (column = model_class.columns_hash[field_name.to_s])
-          return map_database_type(column.type, column.array?, column.null)
+          return FieldInfo.new(model_class, column.type, column.array?, column.null)
         end
 
         # Handle Neo4j models
         if model_class.respond_to?(:declared_properties) && (property = model_class.declared_properties[field_name])
           type = property.type ? property.type.name.split("::").last.downcase : "string"
           # For Neo4j, assume null is always true and array is always false
-          return map_database_type(type, false, true)
+          return FieldInfo.new(model_class, type, false, true)
         end
 
-        "unknown"
+        nil
+      end
+
+      def infer_from_parent_blueprint(field_name, blueprint_class)
+        return nil if blueprint_class == Blueprinter::Base
+        return nil unless blueprint_class.superclass
+
+        parent_class = blueprint_class.superclass
+        infer_field_info(field_name, parent_class)
       end
 
       def map_database_type(field_type, is_array = false, is_null = true)
