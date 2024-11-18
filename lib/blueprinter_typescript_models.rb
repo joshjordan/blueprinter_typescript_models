@@ -25,7 +25,7 @@ module BlueprinterTypescriptModels
     attr_accessor :output_dir
 
     def initialize
-      @output_dir = "frontend/types"
+      @output_dir = "app/javascript/types"
     end
   end
 end
