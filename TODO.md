@@ -9,6 +9,7 @@ The gem will introduce an abstract Interface Definition Layer (IDL) that serves 
 - Support for custom interface definitions directly in Ruby code
 - A centralized location for validation rules, type constraints, and documentation
 - The foundation for generating various outputs (TypeScript interfaces, Zod schemas, model classes)
+- Potential integration with RBS as it gains adoption, leveraging it as an intermediary interface definition layer since models and serializers will increasingly provide RBS type definitions by default
 
 This architecture enables the gem to be serializer-agnostic while maintaining a consistent output format and feature set across different input sources.
 
@@ -28,6 +29,8 @@ This architecture enables the gem to be serializer-agnostic while maintaining a 
   - Generated once as starting points, then maintained manually
   - Interfaces continue to update with server changes
   - Include basic CRUD operations and API integration
+- [ ] Give a way to specify the model class directly for a Blueprint. This may also be a good way to solve the problem of specifying a specific type for identifier fields. Just a general option for Blueprints?
+- [ ] Add support for opting out of type generation for specific blueprints (e.g. abstract base blueprints like ApplicationBlueprint)
 
 ## Rails Integration Improvements
 
