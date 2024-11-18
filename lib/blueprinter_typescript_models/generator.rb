@@ -33,7 +33,7 @@ module BlueprinterTypescriptModels
       private
 
       def generate_for_blueprint(blueprint_class, output_dir)
-        interface_name = blueprint_class.name.demodulize.gsub("Blueprint", "")
+        interface_name = "I#{blueprint_class.name.demodulize.gsub('Blueprint', '')}"
         output_path = File.join(output_dir, "#{interface_name}.d.ts")
         content = generate_interface(interface_name, blueprint_class)
         File.write(output_path, content)
@@ -68,7 +68,7 @@ module BlueprinterTypescriptModels
 
       def collect_associations(blueprint_class)
         blueprint_class.reflections[:default].associations.transform_values do |assoc|
-          name = assoc.blueprint.name.demodulize.gsub("Blueprint", "")
+          name = "I#{assoc.blueprint.name.demodulize.gsub('Blueprint', '')}"
           assoc.options[:blueprint_collection] ? "#{name}[]" : name
         end
       end
